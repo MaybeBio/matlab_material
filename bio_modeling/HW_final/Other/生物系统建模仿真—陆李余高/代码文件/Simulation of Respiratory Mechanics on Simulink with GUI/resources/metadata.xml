@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addOn>
+  <identifier>02c11283-2a44-47cc-96ef-f29eeeafd791</identifier>
+  <displayType>Collection</displayType>
+  <translatedDisplayType>
+    <en_US>Collection</en_US>
+    <es_ES>Collection</es_ES>
+    <es_MX>Collection</es_MX>
+    <ja_JP>コレクション</ja_JP>
+    <ko_KR>컬렉션</ko_KR>
+    <zh_CN>集合</zh_CN>
+  </translatedDisplayType>
+  <name>Simulation of Respiratory Mechanics on Simulink with GUI</name>
+  <author>David Leonardo Rodriguez Sarmiento</author>
+  <version>1.0.2</version>
+  <downloadUrl>https://www.mathworks.com/matlabcentral/mlc-downloads/downloads/02c11283-2a44-47cc-96ef-f29eeeafd791/0ce96429-045b-4d9b-a71d-1f8cfefcb028/packages/zip?src=addons_ml_desktop_install&amp;profile_id=25578660&amp;license=925512&amp;release_family=R2022a</downloadUrl>
+  <licenseUrl>https://addons.mathworks.com/registry/v1/02c11283-2a44-47cc-96ef-f29eeeafd791/1.0.2.0/-/license</licenseUrl>
+  <previewImageUrl>https://www.mathworks.com/responsive_image/160/120/0/0/0/cache/matlabcentral/mlc-downloads/downloads/02c11283-2a44-47cc-96ef-f29eeeafd791/0ce96429-045b-4d9b-a71d-1f8cfefcb028/images/screenshot.jpg</previewImageUrl>
+  <releaseNotesUrl>https://www.mathworks.com/add-ons/02c11283-2a44-47cc-96ef-f29eeeafd791/0ce96429-045b-4d9b-a71d-1f8cfefcb028/releaseNotes</releaseNotesUrl>
+  <installationFolder>Collections</installationFolder>
+</addOn>

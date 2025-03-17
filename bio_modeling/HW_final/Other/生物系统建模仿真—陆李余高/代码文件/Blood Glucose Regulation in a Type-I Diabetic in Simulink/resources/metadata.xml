@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addOn>
+  <identifier>4e5c55d3-2fd6-4053-8418-7450fc35a0af</identifier>
+  <displayType>Collection</displayType>
+  <translatedDisplayType>
+    <en_US>Collection</en_US>
+    <es_ES>Collection</es_ES>
+    <es_MX>Collection</es_MX>
+    <ja_JP>コレクション</ja_JP>
+    <ko_KR>컬렉션</ko_KR>
+    <zh_CN>集合</zh_CN>
+  </translatedDisplayType>
+  <name>Blood Glucose Regulation in a Type-I Diabetic in Simulink</name>
+  <author>John Hedengren</author>
+  <version>1.0.0.0</version>
+  <downloadUrl>https://www.mathworks.com/matlabcentral/mlc-downloads/downloads/submissions/48019/versions/1/download/zip?src=addons_ml_desktop_install&amp;profile_id=25578660&amp;license=925512&amp;release_family=R2022a</downloadUrl>
+  <licenseUrl>https://addons.mathworks.com/registry/v1/4e5c55d3-2fd6-4053-8418-7450fc35a0af/1.0.0.0/-/license</licenseUrl>
+  <previewImageUrl>https://www.mathworks.com/responsive_image/160/120/0/0/0/cache/matlabcentral/mlc-downloads/downloads/submissions/48019/versions/1/screenshot.jpg</previewImageUrl>
+  <releaseNotesUrl>https://www.mathworks.com/add-ons/4e5c55d3-2fd6-4053-8418-7450fc35a0af/7a8396b3-8577-9013-d0b0-cd57800fa847/releaseNotes</releaseNotesUrl>
+  <installationFolder>Collections</installationFolder>
+</addOn>
