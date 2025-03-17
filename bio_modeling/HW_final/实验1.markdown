@@ -1,0 +1,336 @@
+# 实验步骤
+
+1. 从PDB数据库下载The α-helical structure of human
+cathelicidin LL-37 (PDB entry: 2K6O)的结构文件。
+
+```
+wget https://files.rcsb.org/download/2K6O.pdb
+```
+
+1. 激活gmx运行环境
+
+```
+source ./usr/local/gromacs/bin/GMXRC
+```
+
+3. 用pdb2gmx 处理 pdb 文件，指定水的立场为TIP3P，因为蛋白测量方式为NMR，所以`-ignh`忽略氢原子
+
+```
+gmx pdb2gmx -ignh -f 2K6O.pdb -water tip3p
+```
+选择蛋白质力场AMBER99SB-ILDN
+```
+ 6: AMBER99SB-ILDN protein, nucleic AMBER94 (Lindorff-Larsen et al., Proteins 78, 1950-58, 2010)
+```
+得到3个数据文件
+```
+.
+├── 2K6O.pdb
+├── conf.gro
+├── posre.itp
+└── topol.top
+```
+
+4. 建立仿真盒子
+```
+gmx editconf -f conf.gro -d 0.75 -o box.gro
+```
+
+```
+                     :-) GROMACS - gmx editconf, 2023.1 (-:
+
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/moomin/shiyan
+Command line:
+  gmx editconf -f conf.gro -d 0.75 -o box.gro
+
+Note that major changes are planned in future for editconf, to improve usability and utility.
+Read 664 atoms
+Volume: 0.001 nm^3, corresponds to roughly 0 electrons
+No velocities found
+    system size :  5.997  1.688  2.356 (nm)
+    center      :  0.262  0.013  0.006 (nm)
+    box vectors :  0.100  0.100  0.100 (nm)
+    box angles  :  90.00  90.00  90.00 (degrees)
+    box volume  :   0.00               (nm^3)
+    shift       :  3.487  1.581  1.922 (nm)
+new center      :  3.749  1.594  1.928 (nm)
+new box vectors :  7.497  3.188  3.856 (nm)
+new box angles  :  90.00  90.00  90.00 (degrees)
+new box volume  :  92.16               (nm^3)
+
+WARNING: No boxtype specified - distance condition applied in each dimension.
+If the molecule rotates the actual distance will be smaller. You might want
+to use a cubic box instead, or why not try a dodecahedron today?
+
+GROMACS reminds you: "God is a DJ" (Faithless)
+```
+
+5. 在盒子中添加水溶剂
+```
+gmx solvate -cp box.gro -cs spc216.gro -p topol.top -o solvated.gro
+```
+
+6. 添加离子
+```
+gmx grompp -f ions.mdp -p topol.top -c solvated.gro -o ions.tpr
+```
+其中irons.mdp是空文件
+
+设置100nM NaCl
+```
+gmx genion -s ions.tpr -neutral -conc 0.1 -p topol.top -o ions.gro
+```
+选择SOL
+```
+                      :-) GROMACS - gmx genion, 2023.1 (-:
+
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/moomin/shiyan
+Command line:
+  gmx genion -s ions.tpr -neutral -conc 0.1 -p topol.top -o ions.gro
+
+Reading file ions.tpr, VERSION 2023.1 (single precision)
+Reading file ions.tpr, VERSION 2023.1 (single precision)
+Will try to add 6 NA ions and 12 CL ions.
+Select a continuous group of solvent molecules
+Group     0 (         System) has  8629 elements
+Group     1 (        Protein) has   664 elements
+Group     2 (      Protein-H) has   318 elements
+Group     3 (        C-alpha) has    37 elements
+Group     4 (       Backbone) has   111 elements
+Group     5 (      MainChain) has   149 elements
+Group     6 (   MainChain+Cb) has   184 elements
+Group     7 (    MainChain+H) has   187 elements
+Group     8 (      SideChain) has   477 elements
+Group     9 (    SideChain-H) has   169 elements
+Group    10 (    Prot-Masses) has   664 elements
+Group    11 (    non-Protein) has  7965 elements
+Group    12 (          Water) has  7965 elements
+Group    13 (            SOL) has  7965 elements
+Group    14 (      non-Water) has   664 elements
+Select a group: 13
+Selected 13: 'SOL'
+Number of (3-atomic) solvent molecules: 2655
+
+Processing topology
+Replacing 18 solute molecules in topology file (topol.top)  by 6 NA and 12 CL ions.
+
+Back Off! I just backed up topol.top to ./#topol.top.1#
+Using random seed -218141957.
+Replacing solvent molecule 206 (atom 1282) with NA
+Replacing solvent molecule 181 (atom 1207) with NA
+Replacing solvent molecule 1209 (atom 4291) with NA
+Replacing solvent molecule 1713 (atom 5803) with NA
+Replacing solvent molecule 1705 (atom 5779) with NA
+Replacing solvent molecule 86 (atom 922) with NA
+Replacing solvent molecule 459 (atom 2041) with CL
+Replacing solvent molecule 2485 (atom 8119) with CL
+Replacing solvent molecule 1933 (atom 6463) with CL
+Replacing solvent molecule 848 (atom 3208) with CL
+Replacing solvent molecule 349 (atom 1711) with CL
+Replacing solvent molecule 827 (atom 3145) with CL
+Replacing solvent molecule 655 (atom 2629) with CL
+Replacing solvent molecule 1704 (atom 5776) with CL
+Replacing solvent molecule 889 (atom 3331) with CL
+Replacing solvent molecule 1077 (atom 3895) with CL
+Replacing solvent molecule 781 (atom 3007) with CL
+Replacing solvent molecule 640 (atom 2584) with CL
+
+
+GROMACS reminds you: "Uh-oh .... Right Again" (Laurie Anderson)
+
+```
+
+7. 能量最小化预处理
+
+创建配置文件`em.mdp`
+```
+integrator = steep
+nsteps = 500
+nstlist = 10
+rlist = 1.0
+coulombtype = pme
+rcoulomb = 1.0
+vdw-type = cut-off
+rvdw = 1.0
+nstenergy = 10
+```
+```
+gmx grompp -f em.mdp -p topol.top -c ions.gro -o em.tpr
+```
+```
+                      :-) GROMACS - gmx grompp, 2023.1 (-:
+
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/moomin/shiyan
+Command line:
+  gmx grompp -f em.mdp -p topol.top -c ions.gro -o em.tpr
+
+Setting the LD random seed to -1199734801
+
+Generated 2145 of the 2145 non-bonded parameter combinations
+Generating 1-4 interactions: fudge = 0.5
+
+Generated 2145 of the 2145 1-4 parameter combinations
+
+Excluding 3 bonded neighbours molecule type 'Protein_chain_A'
+
+Excluding 2 bonded neighbours molecule type 'SOL'
+
+Excluding 1 bonded neighbours molecule type 'NA'
+
+Excluding 1 bonded neighbours molecule type 'CL'
+Analysing residue names:
+There are:    37    Protein residues
+There are:  2637      Water residues
+There are:    18        Ion residues
+Analysing Protein...
+Number of degrees of freedom in T-Coupling group rest is 17865.00
+The integrator does not provide a ensemble temperature, there is no system ensemble temperature
+
+The largest distance between excluded atoms is 0.387 nm between atom 218 and 229
+Calculating fourier grid dimensions for X Y Z
+Using a fourier grid of 64x28x36, spacing 0.117 0.114 0.107
+
+Estimate for the relative computational load of the PME mesh part: 0.25
+
+This run will generate roughly 1 Mb of data
+
+GROMACS reminds you: "The great tragedy of science - the slaying of a beautiful hypothesis by an ugly fact." (Thomas Henry Huxley)
+
+```
+
+8. 开始运行能量最小化
+```
+gmx mdrun -v -deffnm em
+```
+```
+Energy minimization reached the maximum number of steps before the forces
+reached the requested precision Fmax < 10.
+
+writing lowest energy coordinates.
+
+Steepest Descents did not converge to Fmax < 10 in 501 steps.
+Potential Energy  = -1.3109658e+05
+Maximum force     =  1.9229913e+03 on atom 189
+Norm of force     =  3.9780120e+01
+
+GROMACS reminds you: "I spent a lot of money on booze, birds and fast cars. The rest I just squandered." (George Best)
+```
+
+9. 位置约束平衡
+
+创建配置文件`pr.mdp`
+```
+integrator = md
+nsteps = 50000
+dt = 0.002
+nstenergy = 1000
+nstlist = 10
+rlist = 1.0
+coulombtype = pme
+rcoulomb = 1.0
+vdw-type = cut-off
+rvdw = 1.0
+tcoupl = v-rescale
+tc-grps = protein water_and_ions
+tau-t = 0.5 0.5
+ref-t = 300 300
+pcoupl = parrinello-rahman
+pcoupltype = isotropic
+tau-p = 2.0
+compressibility = 4.5e-5
+ref-p = 1.0
+cutoff-scheme = Verlet
+define = -DPOSRES
+refcoord_scaling = com
+constraints = all-bonds
+```
+预处理
+```
+gmx grompp -f pr.mdp -p topol.top -c em.gro -o pr.tpr -r em.gro
+```
+开始运行
+```
+gmx mdrun -v -deffnm pr
+```
+
+10. 开始模拟
+
+创建配置文件`run.mdp`
+```
+integrator = md
+nsteps = 2000000
+dt = 0.002
+nstlist = 10
+rlist = 1.0
+coulombtype = pme
+rcoulomb = 1.0
+vdw-type = cut-off
+rvdw = 1.0
+tcoupl = v-rescale
+tc-grps = protein water_and_ions
+tau-t = 0.5 0.5
+ref-t = 300 300
+cutoff-scheme = Verlet
+nstxtcout = 5000
+nstenergy = 5000
+```
+
+预处理
+```
+gmx grompp -f run.mdp -p topol.top -c pr.gro -o run.tpr -maxwarn 2
+```
+开始运行
+```
+gmx mdrun -v -deffnm run -stepout 10000
+```
+```
+                      :-) GROMACS - gmx mdrun, 2023.1 (-:
+
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/moomin/shiyan
+Command line:
+  gmx mdrun -v -deffnm run -stepout 10000
+
+
+Back Off! I just backed up run.log to ./#run.log.1#
+Reading file run.tpr, VERSION 2023.1 (single precision)
+Changing nstlist from 10 to 50, rlist from 1 to 1.116
+
+Using 1 MPI thread
+Using 16 OpenMP threads
+
+
+Back Off! I just backed up run.xtc to ./#run.xtc.1#
+
+Back Off! I just backed up run.edr to ./#run.edr.1#
+starting mdrun 'CATHELICIDIN ANTIMICROBIAL PEPTIDE'
+2000000 steps,   4000.0 ps.
+step 1990000, remaining wall clock time:    20 s
+Writing final coordinates.
+step 2000000, remaining wall clock time:     0 s
+               Core t (s)   Wall t (s)        (%)
+       Time:    65324.822     4082.802     1600.0
+                         1h08:02
+                 (ns/day)    (hour/ns)
+Performance:       84.648        0.284
+
+GROMACS reminds you: "User-friendly, adj.: Programmer-hostile." (New Hacker's Dictionary)
+
+```
+
+11. 制作轨迹动画
+
+制作轨迹动画文件
+```
+gmx trjconv -s run.tpr -f run.xtc -e 2500.0 -o movie.pdb
+```
+将该文件在PyMol打开
+
+12. 计算分析模拟结果
